@@ -1,4 +1,4 @@
-# chef-handler-honeycomb
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/REPO)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)# chef-handler-honeycomb
 Chef handler to report chef run statistics to Honeycomb
 
 Steps to use this cookbook to report statistics to [Honeycomb](https://honeycomb.io)
