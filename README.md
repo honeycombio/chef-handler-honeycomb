@@ -1,6 +1,6 @@
 # chef-handler-honeycomb
 
-[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/chef-handler-honeycomb)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/honeycombio/chef-handler-honeycomb?color=success)](https://github.com/honeycombio/home/blob/main/honeycomb-oss-lifecycle-and-practices.md)
 
 Chef handler to report chef run statistics to Honeycomb
 
