@@ -2,7 +2,7 @@ require "chef/http/simple_json"
 require "time"
 require "securerandom" unless defined?(SecureRandom)
 
-VERSION="0.1.1"
+VERSION="3.0.0"
 
 class Honeycomb
   class << self
@@ -56,7 +56,8 @@ class Honeycomb
         'trace.parent_id' => args[:parent_id] ||= nil,
         'service.name' => 'chef',
         'name' => args[:event] ||= 'chef-client',
-        'run_id' => run_id,        
+        'run_id' => run_id,
+        'chef_resources_udpated' => num_resources_modified,
       }
 
       config_data = {
@@ -85,7 +86,7 @@ class Honeycomb
       merge_hash(resource_data, span_data)
 
       if node_exists == true
-        node_data = {
+        h = {
           'chef.node.name' => run_status.node.name,
           'chef.node.guid' => run_status.node['chef_guid'],
           'chef.node.chef_version' => run_status.node['chef_packages']['chef']['version'],
@@ -105,48 +106,53 @@ class Honeycomb
           'chef.policy_name' => run_status.node['policy_name'],
           'chef.policy_group' => run_status.node['policy_group'],
           'chef.policy_revision' => run_status.node['policy_revision'],
+          'chef.run_list' => run_status.node.run_list.to_s,
           'chef.roles' => run_status.node['roles'],
         }
 
-        merge_hash(node_data, span_data)
+        merge_hash(h, span_data)
 
-        node_attributes = run_status.node['honeycomb']['tracked_attributes']
-        merge_hash(node_attributes, span_data)
+        n = run_status.node['honeycomb']['tracked_attributes']
+        merge_hash(n, span_data)
       end
 
       #########################################
       # Define the parent_id if not the root span
       #########################################
       if args.key?(:parent_id)
-        span_data['meta.span_type'] = 'child'
+        h = {
+          'meta.span_type' => 'child',
+        }
+        merge_hash(h, span_data)
       else
-        span_data['meta.span_type'] = 'root'
+        h = { 'meta.span_type' => 'root' }
+        merge_hash(h, span_data)
       end
 
       #########################################
       # Span Duration Values
       #########################################
       if args.key?(:duration_ms)
-        timing_data = {
+        h = {
           'duration_ms' => args[:duration_ms],
           'start_time'  => args[:start_time],
           'end_time'    => args[:end_time],
         }
-        merge_hash(timing_data, span_data)
+        merge_hash(h, span_data)
       end
 
       #########################################
       # These values are used by the root span
       #########################################
       if args[:end_run] == true
-        end_run_data = {
+        h = {
           'start_time' => run_status.start_time.iso8601(fraction_digits = 3),
           'end_time' => run_status.end_time.iso8601(fraction_digits = 3),
           'duration_ms' => (run_status.elapsed_time * 1000.0),
           'success' => run_status.success?,
         }
 
-        merge_hash(end_run_data, span_data)
+        merge_hash(h, span_data)
 
         #########################################
         # If run fails, make it a failure
@@ -155,28 +161,28 @@ class Honeycomb
           run_backtrace = nil
           run_backtrace = run_status.backtrace.join("\n") unless run_status.backtrace.nil?
 
-          error_data = {
+          n = {
             "error" => true,
             "exception" => run_status.exception,
             "backtrace" => run_backtrace,
           }
 
-          merge_hash(error_data, span_data)
+          merge_hash(n, span_data)
         end
 
         #########################################
         # If sending to Automate, generate link to client run
         #########################################
         unless run_status.node['honeycomb']['automate_fqdn'].nil?
-          automate_run_url = "https://#{run_status.node['honeycomb']['automate_fqdn']}"
-          automate_run_url += "/infrastructure/client-runs/#{run_status.node['chef_guid']}"
-          automate_run_url += "/runs/#{run_status.run_id}"
+          am8_url = "https://#{run_status.node['honeycomb']['automate_fqdn']}"
+          am8_url += "/infrastructure/client-runs/#{run_status.node['chef_guid']}"
+          am8_url += "/runs/#{run_status.run_id}"
           
-          automate_data = {
-            'chef.automate_run_link' => automate_run_url,
+          h = {
+            'automate_run_link' => am8_url,
           }
 
-          merge_hash(automate_data, span_data)
+          merge_hash(h, span_data)
         end
       end
 
@@ -190,10 +196,12 @@ class Honeycomb
     end
 
     def report(run_status, trace_batch)
+      
       url = run_status.node['honeycomb']['api_url']
       path = "/1/batch/#{run_status.node['honeycomb']['dataset']}"
       headers = {
         "X-Honeycomb-Team" => run_status.node['honeycomb']['writekey'],
+        "User-Agent" => "honeycomb-chef-handler/#{VERSION}",
       }
 
       Chef::Log.info "Sending trace to Honeycomb API at #{url}#{path}"
