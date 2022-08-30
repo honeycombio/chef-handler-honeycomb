@@ -7,9 +7,8 @@ default['honeycomb']['automate_fqdn'] = "automate.example.com"
 
 # Custom node attributes you want to add as attributes to events for your query-building desires
 default['honeycomb']['tracked_attributes'] = {
-  'chef.node.random_files' => node['random_files'],
-  'chef.node.random_fail' => node['random_fail'],
-  'chef.node.audit.compliance_phase' => node['audit']['compliance_phase'],
+  'chef.node.example' => node['example'],
+  'chef.node.other.example.attribute' => node['other']['example']['attribute'],
 }
 
 ######################################################################
