@@ -1,6 +1,6 @@
 # chef-handler-honeycomb changelog
 
-## [0.8.2] - 2022-09-08
+## [0.2.0] - 2022-09-08
 
 ### Enhancements
 
