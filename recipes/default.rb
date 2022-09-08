@@ -9,8 +9,9 @@ Chef.event_handler do
   root_span_id = SecureRandom.hex(8)
   compile_span_id = SecureRandom.hex(8)
   converge_span_id = SecureRandom.hex(8)
-  # compliance_span_id = SecureRandom.hex(8)
+
   trace_batch = []
+
   comp_start = Time.parse(Time.now.iso8601(fraction_digits = 3))
   @conv_start = Time.parse(Time.now.iso8601(fraction_digits = 3))
   Chef::Client.when_run_starts {|run_status| @handler.instance_variable_set(:@run_status, run_status) }
@@ -284,7 +285,6 @@ Chef.event_handler do
     trace_batch << handler_span
 
     ::Honeycomb.report(@run_status, trace_batch)
-    # Chef::Handler::JsonFile(@run_status, path: '/tmp/reports')
   end
   on :run_failed do
     root_trace = ::Honeycomb.generate_span(@run_status, trace_id: trace_id, span_id: root_span_id, end_run: true)
@@ -321,7 +321,6 @@ Chef.event_handler do
     trace_batch << handler_span
 
     ::Honeycomb.report(@run_status, trace_batch)
-    # Chef::Handler::JsonFile(@run_status, path: '/tmp/reports')
   end
 end
 

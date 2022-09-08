@@ -9,7 +9,7 @@ Steps to use this cookbook to report statistics to [Honeycomb](https://honeycomb
 * put your writekey in the attributes file, update dataset name if you wish
 * add the cookbook *early* in the list (first is great)
 * add the commented section from the recipes/default.rb to client.rb or other location
-** details: [https://docs.chef.io/config_rb_client.html](https://docs.chef.io/config_rb_client.html)
+** See Chef's [config.rb documentation](https://docs.chef.io/config_rb_client.html)
 
 run chef and see reports in Honeycomb!
 
