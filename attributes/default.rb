@@ -3,12 +3,12 @@ default['honeycomb']['api_url'] = "https://api.honeycomb.io"
 default['honeycomb']['dataset'] = "chefruns"
 
 # Used to generate a link to chef-run information in Automate
-default['honeycomb']['automate_fqdn'] = "automate.example.com"
+# default['honeycomb']['automate_fqdn'] = "automate.example.com"
 
 # Custom node attributes you want to add as attributes to events for your query-building desires
 default['honeycomb']['tracked_attributes'] = {
-  'chef.node.example' => node['example'],
-  'chef.node.other.example.attribute' => node['other']['example']['attribute'],
+  # 'chef.node.example' => node['example'],
+  # 'chef.node.other.example.attribute' => node['other']['example']['attribute'],
 }
 
 ######################################################################
