@@ -1,7 +1,7 @@
 ###############################################################
 # Adding this recipe to the runlist of your node or policyfile
 #   should work well to get you nice waterfall representations
-#   of your Chef-Client runs
+#   of your Chef-Client runs in Honeycomb
 ###############################################################
 
 Chef.event_handler do
@@ -355,7 +355,7 @@ end
   #     ::Honeycomb.converge_start()
   #   end
   #   on :converge_complete do
-  #     ::Honeycomb.converge_complete()
+  #     ::Honeycomb.converge_completed()
   #   end
   #   on :handlers_start do
   #     ::Honeycomb.handlers_start()
