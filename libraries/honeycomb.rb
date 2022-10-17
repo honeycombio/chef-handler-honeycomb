@@ -2,7 +2,7 @@ require "chef/http/simple_json"
 require "time"
 require "securerandom" unless defined?(SecureRandom)
 
-VERSION="3.0.0"
+VERSION="3.0.1"
 
 class Honeycomb
   class << self
