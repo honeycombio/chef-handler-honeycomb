@@ -2,7 +2,7 @@ require "chef/http/simple_json"
 require "time"
 require "securerandom" unless defined?(SecureRandom)
 
-VERSION="3.0.1"
+VERSION="3.0.2"
 
 class Honeycomb
   class << self
@@ -197,7 +197,7 @@ class Honeycomb
       path = "/1/batch/#{run_status.node['honeycomb']['dataset']}"
       headers = {
         "X-Honeycomb-Team" => run_status.node['honeycomb']['writekey'],
-        "User-Agent" => "honeycomb-chef-handler/#{VERSION}",
+        "user-agent" => "honeycomb-chef-handler/#{VERSION}",
       }
 
       Chef::Log.info "Sending trace to Honeycomb API at #{url}#{path}"
