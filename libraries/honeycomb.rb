@@ -2,7 +2,7 @@ require "chef/http/simple_json"
 require "time"
 require "securerandom" unless defined?(SecureRandom)
 
-VERSION="0.1.1"
+VERSION="3.0.2"
 
 class Honeycomb
   class << self
@@ -56,7 +56,8 @@ class Honeycomb
         'trace.parent_id' => args[:parent_id] ||= nil,
         'service.name' => 'chef',
         'name' => args[:event] ||= 'chef-client',
-        'run_id' => run_id,        
+        'run_id' => run_id,
+        'chef_resources_udpated' => num_resources_modified,
       }
 
       config_data = {
@@ -105,6 +106,7 @@ class Honeycomb
           'chef.policy_name' => run_status.node['policy_name'],
           'chef.policy_group' => run_status.node['policy_group'],
           'chef.policy_revision' => run_status.node['policy_revision'],
+          'chef.run_list' => run_status.node.run_list.to_s,
           'chef.roles' => run_status.node['roles'],
         }
 
@@ -190,10 +192,12 @@ class Honeycomb
     end
 
     def report(run_status, trace_batch)
+      
       url = run_status.node['honeycomb']['api_url']
       path = "/1/batch/#{run_status.node['honeycomb']['dataset']}"
       headers = {
         "X-Honeycomb-Team" => run_status.node['honeycomb']['writekey'],
+        "user-agent" => "honeycomb-chef-handler/#{VERSION}",
       }
 
       Chef::Log.info "Sending trace to Honeycomb API at #{url}#{path}"
